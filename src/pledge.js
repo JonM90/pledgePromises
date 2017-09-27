@@ -8,14 +8,11 @@ function $Promise(executor) {
   this._state = 'pending';
   this._value;
 
-  var resolve = this._internalResolve.bind(this);
-  var reject = this._internalReject.bind(this);
-  executor(resolve, reject);
+  executor(this._internalResolve.bind(this), this._internalReject.bind(this));
+//   return this;
 }
 
 $Promise.prototype._internalResolve = function(data) {
-  //console.log('this._state:', data._state)
-  // this = data;
   if (this._state === 'pending') {
     this._state = 'fulfilled';
     this._value = data;
@@ -34,15 +31,23 @@ $Promise.prototype._internalReject = function(reason) {
 $Promise.prototype.then = function(onSuccess, onReject) {
     this._handlerGroups = this._handlerGroups || [];
     let handlers = {
-        successCb: onSuccess = typeof onSuccess === 'function' ? onSuccess : null,
-        errorCb: onReject = typeof onReject === 'function' ? onReject : null
+        successCb: typeof onSuccess === 'function' ? onSuccess : null,
+        errorCb: typeof onReject === 'function' ? onReject : null,
+        downstreamPromise: new $Promise(function () {})
     };
+    // if (handlers.successCb) {
+    //     handlers.downstreamPromise = new $Promise(function () {})
+    // } else if (!handlers.successCb) {
+    //     handlers.downstreamPromise = this;
+    // }
     this._handlerGroups.push(handlers);
     if (this._state === 'fulfilled') {
+        // handlers.downstreamPromise = new $Promise(handlers.successCb(this._value));
         handlers.successCb(this._value);
     } else if (this._state === 'rejected' && onReject) {
         handlers.errorCb(this._value);
     }
+    return handlers.downstreamPromise;
 }
 
 $Promise.prototype._callHandlers = function(handlerGroups) {

@@ -42,7 +42,7 @@ describe('For a given promiseA (pA)', function(){
   // Our parent promise must maintain some kind of reference to the downstream
   // promise, in order to control chaining.
 
-  xit('`.then` adds a new promise to its handler group', function(){
+  it('`.then` adds a new promise to its handler group', function(){
     promiseA.then();
     var groups = promiseA._handlerGroups;
     expect( groups[0].downstreamPromise instanceof $Promise ).toBe( true );
@@ -55,7 +55,7 @@ describe('For a given promiseA (pA)', function(){
   // Passing this may break your `.catch` from chapter 3. If that happens,
   // you will have to go back and fix `.catch`, taking this spec into account.
 
-  xit('`.then` returns that downstream promise', function(){
+  it('`.then` returns that downstream promise', function(){
     var promiseB = promiseA.then();
     expect( promiseB ).toBe( promiseA._handlerGroups[0].downstreamPromise );
   });
@@ -73,7 +73,7 @@ describe('For a given promiseA (pA)', function(){
 
     // Fulfillment bubbles down to the first available success handler.
 
-    xit("if pA is fulfilled but has no success handler, pB is fulfilled with pA's value", function (done) {
+    it("if pA is fulfilled but has no success handler, pB is fulfilled with pA's value", function (done) {
       var promiseB = promiseA.then();
       promiseA._internalResolve( 9001 );
       // Do not set state manually; a resolver should be called somewhere.
